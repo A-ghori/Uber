@@ -15,4 +15,15 @@ router.post('/register', [
 userController.registerUser,
 )
 
+router.post('/login',[
+    body('email').isEmail().withMessage('Incorrect Email'),
+
+
+    body('password').isLength({ min:5}).withMessage("Firse Galat Password diya tune")
+],
+userController.loginUser,
+)
+
+
+
 module.exports = router;

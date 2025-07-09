@@ -94,6 +94,237 @@ Content-Type: application/json
 - `user`: The created user object (password is not included).
 
 ---
+---
+
+### Error Responses
+
+#### 400 Bad Request
+
+- **Description:** One or more fields are invalid.
+- **Body:**
+
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "msg": "Incorrect Email",
+      "path": "email",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "msg": "Firse Galat Password diya tune",
+      "path": "password",
+      "location": "body"
+    }
+  ]
+}
+```# User Registration & Login API Documentation
+
+This document describes the `/users/register` and `/users/login` endpoints for your Uber Clone backend.
+
+---
+
+## Endpoint: Register User
+
+**POST** `/users/register`
+
+Registers a new user and returns a JWT token and user information.
+
+### Request Body
+
+```json
+{
+  "fullname": {
+    "firstname": "string (min 5 chars, required)",
+    "lastname": "string (min 5 chars, optional)"
+  },
+  "email": "string (valid email, required)",
+  "password": "string (min 5 chars, required)"
+}
+```
+
+### Example Request
+
+```json
+{
+  "fullname": {
+    "firstname": "Sohail",
+    "lastname": "Khan"
+  },
+  "email": "sohail@example.com",
+  "password": "secret123"
+}
+```
+
+### Example Successful Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjY2NjY2NjY2NjY2NjY2NjY2NiIsImlhdCI6MTY5MDAwMDAwMH0.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567",
+  "user": {
+    "_id": "666666666666666666666666",
+    "fullname": {
+      "firstname": "Sohail",
+      "lastname": "Khan"
+    },
+    "email": "sohail@example.com",
+    "socketId": null
+  }
+}
+```
+
+---
+
+## Endpoint: User Login
+
+**POST** `/users/login`
+
+Authenticates a user and returns a JWT token and user information.
+
+### Request Body
+
+```json
+{
+  "email": "string (valid email, required)",
+  "password": "string (min 5 chars, required)"
+}
+```
+
+### Example Request
+
+```json
+{
+  "email": "sohail@example.com",
+  "password": "secret123"
+}
+```
+
+### Example Successful Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjY2NjY2NjY2NjY2NjY2NjY2NiIsImlhdCI6MTY5MDAwMDAwMH0.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567",
+  "user": {
+    "_id": "666666666666666666666666",
+    "fullname": {
+      "firstname": "Sohail",
+      "lastname": "Khan"
+    },
+    "email": "sohail@example.com",
+    "socketId": null
+  }
+}
+```
+
+---
+
+### Error Responses
+
+#### 400 Bad Request
+
+- **Description:** One or more fields are invalid.
+- **Body:**
+
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "msg": "Incorrect Email",
+      "path": "email",
+      "location": "body"
+    },
+    {
+      "type": "field",
+      "msg": "Firse Galat Password diya tune",
+      "path": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### 401 Unauthorized
+
+- **Description:** Invalid email or password.
+- **Body:**
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+or
+```json
+{
+  "message": "Invalid Password "
+}
+```
+
+#### 500 Internal Server Error
+
+- **Description:** Server error or database issue.
+- **Body:**
+
+```json
+{
+  "error": "Error message"
+}
+```
+
+---
+
+## Notes
+
+- All required fields must be present and valid.
+- The password is hashed and never returned in the response.
+- The endpoint expects the request body in JSON format.
+- JWT token is returned on successful
+
+## Endpoint: User Login
+
+**POST** `/users/login`
+
+Authenticates a user and returns a JWT token and user information.
+
+### Request Body
+
+```json
+{
+  "email": "string (valid email, required)",
+  "password": "string (min 5 chars, required)"
+}
+```
+
+### Example Request
+
+```json
+{
+  "email": "sohail@example.com",
+  "password": "secret123"
+}
+```
+
+### Example Successful Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjY2NjY2NjY2NjY2NjY2NjY2NiIsImlhdCI6MTY5MDAwMDAwMH0.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567",
+  "user": {
+    "_id": "666666666666666666666666",
+    "fullname": {
+      "firstname": "Sohail",
+      "lastname": "Khan"
+    },
+    "email": "sohail@example.com",
+    "socketId": null
+  }
+}
+```
+
+---
 
 ## Error Responses
 
@@ -177,14 +408,55 @@ Content-Type: application/json
 
 ```js
 const userModel = require('../models/user.model');
-const userService = require('../services/user.service');
+const userService = require('../services/user.service');   
 const { validationResult } = require('express-validator');
 
 module.exports.registerUser = async (req, res, next) => {
     const errors = validationResult(req);
+
+//     if (!errors.isEmpty()) { ... }
+// .isEmpty() checks if any validation errors exist.
+
+// !errors.isEmpty() means:
+
+// ❗ If there are validation errors...
+
+// ## So you enter the if block only when there are problems in the request data.
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+
+//     🔹 return res.status(400).json({ errors: errors.array() });
+// res.status(400) sets the HTTP status code to 400 (Bad Request).
+
+// .json({...}) sends a JSON response to the client.
+
+// { errors: errors.array() } is the actual object you’re returning:
+// {
+//   "errors": [
+//     {
+//       "msg": "Invalid Email Bhai Sahi Email Likh Chori Mat Kar",
+//       "param": "email",
+//       "location": "body",
+//       "value": "wrongemail"
+//     },
+//     {
+//       "msg": "First name too short",
+//       "param": "fullname.firstname",
+//       ...
+//     }
+//   ]
+// }
+// 🧠 The reason for:
+
+// js
+// Copy
+// Edit
+// { errors: errors.array() }
+// is to make the response a structured JSON object. The outer {} makes it an object, and the errors: [...] key holds an array of errors.
+
+
+
 
     const { fullname, email, password } = req.body;
     const hashedPassword = await userModel.hashPassword(password);
